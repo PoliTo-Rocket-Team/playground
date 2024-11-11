@@ -2,6 +2,7 @@ from rocketpy import Environment, SolidMotor, Rocket, Flight, EnvironmentAnalysi
 import datetime
 import matplotlib.pyplot as plt
 import numpy
+import csv
 
 
 
@@ -11,13 +12,15 @@ Env = Environment(
     elevation = 160,#LoadedEnv["elevation"],
     datum="WGS84"
           )
-date = datetime.datetime(2024,11,10,10)
+date = datetime.datetime(2024,10,12,10)
 Env.set_date(date=date,timezone='UTC')
 
 
-#Env.set_atmospheric_model(type='Forecast', file='GFS')
-Env.set_atmospheric_model(type='Windy', file= 'ECMWF')
 
+#Env.set_atmospheric_model(type='Forecast', file='GFS')
+#Env.set_atmospheric_model(type='Windy', file= 'ECMWF')
+#url = "https://weather.uwyo.edu/cgi-bin/wyowx.fcgi?TYPE=sflist&DATE=20241013&HOUR=10&UNITS=A&STATION=LPMT"
+Env.set_atmospheric_model(type='windy', file='ECMWF')
 
 
 
@@ -36,7 +39,8 @@ M1790 = SolidMotor(   #TODO: TO CHECK
     center_of_dry_mass_position=0,
     dry_mass=3567/1000, #OK
     dry_inertia=(0.14832,0.14832,0.00534),  #OK
-    grains_center_of_mass_position=0)
+    grains_center_of_mass_position=0,
+    coordinate_system_orientation='nozzle_to_combustion_chamber')
 #M1790.all_info()
 
 
@@ -191,5 +195,26 @@ drogue = VES.add_parachute(
 #PLOTS AND CALCULATIONS
 
 TestFlight = Flight(rocket = VES, environment = Env, inclination = 85, rail_length = 12, heading=133)
+
+
+
+TestFlight.export_data(
+    'RocketPy.csv',
+    'angle_of_attack',
+    'speed',
+    'acceleration',
+    'x',
+    'y',
+    'z',
+    'latitude',
+    'longitude',
+    'pressure',
+    'ax',
+    'ay',
+    'az',
+    'aerodynamic_drag',
+    'thrust_power',
+    time_step=0.04,
+)
 
 VES.draw()
